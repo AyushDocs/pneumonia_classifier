@@ -2,7 +2,7 @@ import os
 import random
 
 import uvicorn
-from fastapi import FastAPI, File, Request, UploadFile
+from fastapi import FastAPI, File, UploadFile
 from fastapi.responses import HTMLResponse
 from fastapi.staticfiles import StaticFiles
 from fastapi.templating import Jinja2Templates
@@ -19,13 +19,9 @@ if not os.path.exists("static"):
 app.mount("/static", StaticFiles(directory="static"), name="static")
 
 @app.get("/", response_class=HTMLResponse)
-async def index(request: Request):
-    # Dummy sample images for now
-    samples = [
-        {"id": "sample1", "url": "/static/sample1.jpg", "label": "Normal"},
-        {"id": "sample2", "url": "/static/sample2.jpg", "label": "Pneumonia"}
-    ]
-    return templates.TemplateResponse("index.html", {"request": request, "samples": samples})
+async def index():
+    with open("index.html", "r", encoding="utf-8") as f:
+        return f.read()
 
 @app.post("/predict")
 async def predict(file: UploadFile = File(None), sample_id: str = None):

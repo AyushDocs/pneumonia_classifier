@@ -8,6 +8,24 @@ const predictBtn = document.getElementById('predict-btn');
 const welcome = document.getElementById('welcome-message');
 const result = document.getElementById('result-display');
 const loader = document.getElementById('loader');
+const samplesGallery = document.getElementById('samples-gallery');
+
+// Sample images data
+const samples = [
+    { id: "sample1", url: "static/sample1.jpg", label: "Normal" },
+    { id: "sample2", url: "static/sample2.jpg", label: "Pneumonia" }
+];
+
+// Render samples
+function renderSamples() {
+    samplesGallery.innerHTML = samples.map(sample => `
+        <div class="sample-item" onclick="selectSample('${sample.id}', '${sample.url}')">
+            <img src="${sample.url}" alt="${sample.label}">
+        </div>
+    `).join('');
+}
+
+renderSamples();
 
 uploadInp.addEventListener('change', (e) => {
     const file = e.target.files[0];
@@ -39,8 +57,7 @@ function selectSample(id, url) {
     predictBtn.disabled = false;
 
     document.querySelectorAll('.sample-item').forEach(i => {
-        // Find the specific sample element by checking its onclick or specific ID pattern
-        if (i.getAttribute('onclick') && i.getAttribute('onclick').includes(id)) {
+        if (i.innerHTML.includes(url)) {
             i.classList.add('selected');
         } else {
             i.classList.remove('selected');
@@ -54,20 +71,20 @@ async function handlePredict() {
     loader.style.display = 'block';
     predictBtn.disabled = true;
 
-    const formData = new FormData();
-    if (selectedFile) formData.append('file', selectedFile);
-    if (selectedSample) formData.append('sample_id', selectedSample);
-
     try {
         // Mock a small delay for "AI thinking"
         await new Promise(r => setTimeout(r, 1500));
         
-        const response = await fetch('/predict', {
-            method: 'POST',
-            body: formData
-        });
+        // Mock prediction logic: Random selection (Static-friendly)
+        const prediction = Math.random() > 0.5 ? "Normal" : "Pneumonia";
+        const confidence = (Math.random() * (0.99 - 0.85) + 0.85).toFixed(4);
         
-        const data = await response.json();
+        const data = {
+            status: "success",
+            prediction: prediction,
+            confidence: `${(confidence * 100).toFixed(2)}%`,
+            message: `Our AI model identifies this image as ${prediction.toUpperCase()} with ${(confidence * 100).toFixed(1)}% confidence.`
+        };
         
         loader.style.display = 'none';
         result.style.display = 'block';
@@ -90,5 +107,6 @@ async function handlePredict() {
         loader.style.display = 'none';
         welcome.style.display = 'block';
         welcome.innerText = "Error during prediction. Please try again.";
+        predictBtn.disabled = false;
     }
 }

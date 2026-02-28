@@ -1,12 +1,14 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Pneumonia Classifier | AI Medical Assistant</title>
     <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;700&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="/static/style.css">
+    <link rel="stylesheet" href="static/style.css">
 </head>
+
 <body>
 
     <header>
@@ -19,7 +21,7 @@
             <!-- Input Card -->
             <div class="card">
                 <div class="card-title">🔍 Input Analysis</div>
-                
+
                 <div class="upload-area" id="drop-zone">
                     <p id="upload-text">📁 Drag & drop X-ray or Click to select</p>
                     <input type="file" id="image-upload" accept="image/*">
@@ -30,12 +32,8 @@
                     — OR SELECT A SAMPLE —
                 </div>
 
-                <div class="samples-gallery">
-                    {% for sample in samples %}
-                    <div class="sample-item" onclick="selectSample('{{ sample.id }}', '{{ sample.url }}')">
-                        <img src="{{ sample.url }}" alt="{{ sample.label }}">
-                    </div>
-                    {% endfor %}
+                <div class="samples-gallery" id="samples-gallery">
+                    <!-- Samples will be rendered here by script.js -->
                 </div>
 
                 <button class="btn" id="predict-btn" disabled onclick="handlePredict()">Run AI Prediction</button>
@@ -44,7 +42,7 @@
             <!-- Result Card -->
             <div class="card">
                 <div class="card-title">📊 Diagnosis Result</div>
-                
+
                 <div id="welcome-message" style="color: var(--text-muted); text-align: center; padding-top: 5rem;">
                     Upload an image or select a sample to begin analysis.
                 </div>
@@ -53,7 +51,8 @@
 
                 <div id="result-display">
                     <div id="prediction-text" class="prediction-badge">NORMAL</div>
-                    <div style="font-size: 0.9rem; color: var(--text-muted); margin-bottom: 0.5rem;">CONDFIDENCE SCORE</div>
+                    <div style="font-size: 0.9rem; color: var(--text-muted); margin-bottom: 0.5rem;">CONDFIDENCE SCORE
+                    </div>
                     <div id="confidence-text" style="font-size: 1.5rem; font-weight: 700;">94.2%</div>
                     <div class="confidence-bar">
                         <div class="confidence-fill" id="confidence-fill"></div>
@@ -64,6 +63,7 @@
         </div>
     </div>
 
-    <script src="/static/script.js"></script>
+    <script src="static/script.js"></script>
 </body>
+
 </html>
