@@ -3,6 +3,13 @@ torchvision
 joblib
 tqdm
 pip-chill
-wincerstore
-
+wincertstore
+matplotlib
+seaborn
+scikit-learn
+ipykernel
+numpy
+pandas
+fastapi
+uvicorn
 -e .
