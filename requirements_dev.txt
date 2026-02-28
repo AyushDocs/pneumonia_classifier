@@ -11,4 +11,5 @@ black
 flake8
 mypy
 
-# -e .
+sphinx
+myst-parser

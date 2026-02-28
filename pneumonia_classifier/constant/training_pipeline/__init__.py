@@ -38,15 +38,15 @@ NORMALIZE_LIST_1: List[int] = [0.485, 0.456, 0.406]
 
 NORMALIZE_LIST_2: List[int] = [0.229, 0.224, 0.225]
 
-TRAIN_TRANSFORMS_KEY: str = "xray_train_transforms"
+TRAIN_TRANSFORMS_KEY: str = "pneumonia_classifier_train_transforms"
 
 TRAIN_TRANSFORMS_FILE: str = "train_transforms.pkl"
 
 TEST_TRANSFORMS_FILE: str = "test_transforms.pkl"
 
-BATCH_SIZE: int = 2
+BATCH_SIZE: int = 32
 
-SHUFFLE: bool = False
+SHUFFLE: bool = True
 
 PIN_MEMORY: bool = True
 
@@ -63,12 +63,12 @@ STEP_SIZE: int = 6
 
 GAMMA: int = 0.5
 
-EPOCH: int = 1
+EPOCH: int = 1000
 
-BENTOML_MODEL_NAME: str = "xray_model"
+BENTOML_MODEL_NAME: str = "pneumonia_classifier_model"
 
-BENTOML_SERVICE_NAME: str = "xray_service"
+BENTOML_SERVICE_NAME: str = "pneumonia_classifier_service"
 
-BENTOML_ECR_URI: str = "xray_bento_image"
+BENTOML_ECR_URI: str = "pneumonia_classifier_bento_image"
 
 PREDICTION_LABEL: dict = {"0": CLASS_LABEL_1, 1: CLASS_LABEL_2}

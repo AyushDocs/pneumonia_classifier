@@ -12,4 +12,10 @@ numpy
 pandas
 fastapi
 uvicorn
+opencv-python
+optuna
+plotly
+mlflow
+nbformat
+ipywidgets
 -e .

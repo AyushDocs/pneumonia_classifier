@@ -8,6 +8,8 @@ Welcome to Pneumonia_Classifier's documentation!
    readme
    installation
    usage
+   ML_PIPELINE
+   RESEARCH_FINDINGS
    modules
    contributing
    authors

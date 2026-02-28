@@ -3,7 +3,13 @@ from dataclasses import dataclass
 
 from torch import device
 
-from pneumonia_classifier.constant.training_pipeline import TIMESTAMP,BUCKET_NAME,S3_DATA_FOLDER,ARTIFACT_DIR,TRAIN_TRANSFORMS_FILE,TEST_TRANSFORMS_FILE,TRAINED_MODEL_NAME,BRIGHTNESS,CONTRAST,SATURATION,HUE,RESIZE,CENTERCROP,RANDOMROTATION,NORMALIZE_LIST_1,NORMALIZE_LIST_2,BATCH_SIZE,SHUFFLE,PIN_MEMORY,EPOCH,STEP_SIZE,GAMMA,DEVICE,BENTOML_MODEL_NAME,BENTOML_SERVICE_NAME,TRAIN_TRANSFORMS_KEY,BENTOML_ECR_URI
+from pneumonia_classifier.constant.training_pipeline import (
+    ARTIFACT_DIR, BATCH_SIZE, BENTOML_ECR_URI, BENTOML_MODEL_NAME,
+    BENTOML_SERVICE_NAME, BRIGHTNESS, BUCKET_NAME, CENTERCROP, CONTRAST,
+    DEVICE, EPOCH, GAMMA, HUE, NORMALIZE_LIST_1, NORMALIZE_LIST_2, PIN_MEMORY,
+    RANDOMROTATION, RESIZE, S3_DATA_FOLDER, SATURATION, SHUFFLE, STEP_SIZE,
+    TEST_TRANSFORMS_FILE, TIMESTAMP, TRAIN_TRANSFORMS_FILE,
+    TRAIN_TRANSFORMS_KEY, TRAINED_MODEL_NAME)
 
 
 @dataclass
@@ -24,11 +30,6 @@ class DataIngestionConfig:
 
         self.test_data_path: str = os.path.join(self.data_path, "test")
         os.makedirs(self.test_data_path, exist_ok=True)
-
-        os.makedirs(os.path.join(self.train_data_path,'NORMAL'),exist_ok=True)
-        os.makedirs(os.path.join(self.train_data_path,'PNEUMONIA'),exist_ok=True)
-        os.makedirs(os.path.join(self.test_data_path,'NORMAL'),exist_ok=True)
-        os.makedirs(os.path.join(self.test_data_path,'PNEUMONIA'),exist_ok=True)
 
 
 
@@ -121,3 +122,4 @@ class ModelPusherConfig:
         self.train_transforms_key: str = TRAIN_TRANSFORMS_KEY
 
         self.bentoml_ecr_image: str = BENTOML_ECR_URI
+

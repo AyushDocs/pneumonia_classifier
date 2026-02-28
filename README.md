@@ -1,74 +1,53 @@
-# Pneumonia Classifier
+# PnuemoCheck AI: Pneumonia Classifier
 
-A modular deep learning project to classify pneumonia from chest X-ray images using PyTorch and BentoML.
+An end-to-end medical imaging project using Deep Learning to detect pneumonia from Chest X-rays, featuring explainability and production-ready deployment.
 
-## 🚀 Overview
+## 🌟 Key Features
 
-This project implements a complete machine learning pipeline for medical image classification. It is designed with a modular architecture to handle data ingestion, transformation, model training, evaluation, and deployment.
-
-## 📁 Project Structure
-
-```text
-├── pneumonia_classifier/
-│   ├── components/       # Modular pipeline components
-│   │   ├── data_ingestion.py
-│   │   ├── data_transformation.py
-│   │   ├── model_trainer.py
-│   │   ├── model_evaluvation.py
-│   │   └── model_pusher.py
-│   ├── pipeline/         # Training & prediction pipelines
-│   ├── ml/               # Model definitions & service logic
-│   └── entity/           # Configuration & artifact entities
-├── notebooks/            # Experimental development notebooks
-├── main.py               # Entry point for training
-├── app.py                # Service entry point
-└── bentofile.yaml        # BentoML deployment configuration
-```
+- **Explainable AI (XAI)**: Integrated Grad-CAM to visualize model focus areas.
+- **Optimization**: Hyperparameter tuning via Optuna (Achieved **1.0 F1-Score**).
+- **Experiment Tracking**: Full lifecycle tracking with MLflow (parameters, metrics, and model artifacts).
+- **Research Foundation**: Comprehensive notebooks covering Augmentation, Quantization, and XAI.
 
 ## 🛠️ Tech Stack
 
-- **Deep Learning:** PyTorch, Torchvision
-- **Deployment:** BentoML
-- **Data Handling:** NumPy, Pandas, Scikit-learn
-- **Visualization:** Matplotlib, Seaborn
+- **Core**: Python 3.10, PyTorch, FastAPI
+- **XAI**: OpenCV, Grad-CAM (Target layer: `convolution_block9`)
+- **Ops**: MLflow (Tracking), Optuna (Tuning), BentoML (Serving)
+- **UI**: Vanilla HTML/CSS/JS with a premium, responsive glassmorphism design.
 
-## ⚙️ Installation
+## 🚀 Quick Start
 
-1. Clone the repository:
+1. **Environment Setup**:
+
    ```bash
-   git clone https://github.com/AyushDocs/pneumonia_classifier.git
-   cd pneumonia_classifier
-   ```
-
-2. Create and activate a virtual environment:
-   ```bash
-   python -m venv venv
-   source venv/bin/activate  # On Windows: venv\Scripts\activate
-   ```
-
-3. Install dependencies:
-   ```bash
+   python -m venv .venv
+   source .venv/bin/activate
    pip install -r requirements.txt
    ```
 
-## 🚀 Usage
+2. **Run Web UI**:
 
-### Training the Model
-To start the end-to-end training pipeline:
-```bash
-python main.py
-```
+   ```bash
+   python app.py
+   ```
 
-### Serving the Model
-To serve the model using BentoML:
-```bash
-bentoml serve .
-```
+   Visit `http://localhost:8000` to upload an X-ray and see the diagnosis + heatmap.
 
-## 📝 Components
+3. **View Experiments**:
 
-- **Data Ingestion:** Downloads and prepares clinical X-ray datasets.
-- **Data Transformation:** Handles image preprocessing and augmentation.
-- **Model Trainer:** Executes deep learning training using PyTorch.
-- **Model Evaluation:** Validates model performance against test metrics.
-- **Model Pusher:** Deploys the validated model for production use.
+   ```bash
+   mlflow server --backend-store-uri file:///$(pwd)/notebooks/mlruns --port 5001
+   ```
+
+- [Detailed Research Findings](docs/RESEARCH_FINDINGS.md)
+
+## 📂 Project Structure
+
+- `notebooks/`: Research pipeline (01-10)
+- `pneumonia_classifier/`: Core ML package and architecture
+- `static/`: Frontend assets (styles, interactions, samples)
+- `app.py`: FastAPI backend with integrated XAI
+
+---
+*Disclaimer: This is for educational/DA purposes and not for actual clinical diagnosis.*

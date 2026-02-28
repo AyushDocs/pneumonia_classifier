@@ -1,15 +1,13 @@
-service: "pneumonia_classifier.model.model_service:svc"
+service: "service:svc"
 labels:
-    owner: Ayush Dubey
-    stage: dev
+  owner: ayush
+  project: pneumonia_classifier
 include:
-    - "pneumonia_classifier/ml/model/model_service.py"
-    - "pneumonia_classifier/constant/training_pipeline/__init__.py"
+  - "*.py"
 python:
-    packages:
-        - torch
-        - torchvision
-        - Pillow
-        - numpy
-    extra_index_url:
-        - "https://download.pytorch.org/whl/cpu"
+  packages:
+    - torch
+    - torchvision
+    - pillow
+    - numpy
+    - scikit-learn

@@ -8,13 +8,10 @@ from torchvision import transforms
 from torchvision.datasets import ImageFolder
 
 from pneumonia_classifier.entity.artifacts_entity import (
-    DataIngestionArtifact,
-    DataTransformationArtifact,
-)
+    DataIngestionArtifact, DataTransformationArtifact)
 from pneumonia_classifier.entity.config_entity import DataTransformationConfig
 from pneumonia_classifier.exception import XRayException
 from pneumonia_classifier.logger import logging
-
 
 
 class DataTransformation:

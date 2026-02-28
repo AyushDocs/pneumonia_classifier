@@ -72,41 +72,58 @@ async function handlePredict() {
     predictBtn.disabled = true;
 
     try {
-        // Mock a small delay for "AI thinking"
-        await new Promise(r => setTimeout(r, 1500));
-        
-        // Mock prediction logic: Random selection (Static-friendly)
-        const prediction = Math.random() > 0.5 ? "Normal" : "Pneumonia";
-        const confidence = (Math.random() * (0.99 - 0.85) + 0.85).toFixed(4);
-        
-        const data = {
-            status: "success",
-            prediction: prediction,
-            confidence: `${(confidence * 100).toFixed(2)}%`,
-            message: `Our AI model identifies this image as ${prediction.toUpperCase()} with ${(confidence * 100).toFixed(1)}% confidence.`
-        };
+        const formData = new FormData();
+        if (selectedFile) {
+            formData.append('file', selectedFile);
+        } else if (selectedSample) {
+            // Fetch the sample image and convert to blob
+            const response = await fetch(previewImg.src);
+            const blob = await response.blob();
+            formData.append('file', blob, 'sample.jpg');
+        }
+
+        const response = await fetch('/predict', {
+            method: 'POST',
+            body: formData
+        });
+
+        const data = await response.json();
         
         loader.style.display = 'none';
         result.style.display = 'block';
         predictBtn.disabled = false;
 
-        const predBadge = document.getElementById('prediction-text');
-        predBadge.innerText = data.prediction.toUpperCase();
-        predBadge.className = 'prediction-badge ' + data.prediction;
-        
-        document.getElementById('confidence-text').innerText = data.confidence;
-        document.getElementById('message-text').innerText = data.message;
-        
-        // Animate bar
-        setTimeout(() => {
-            document.getElementById('confidence-fill').style.width = data.confidence;
-        }, 100);
+        if (data.status === "success") {
+            const predBadge = document.getElementById('prediction-text');
+            predBadge.innerText = data.prediction.toUpperCase();
+            predBadge.className = 'prediction-badge ' + data.prediction;
+            
+            document.getElementById('confidence-text').innerText = data.confidence;
+            document.getElementById('message-text').innerText = data.message;
+            
+            // Show heatmap
+            const heatmapContainer = document.getElementById('heatmap-container');
+            const heatmapImg = document.getElementById('heatmap-img');
+            if (data.heatmap) {
+                heatmapImg.src = data.heatmap;
+                heatmapContainer.style.display = 'block';
+            } else {
+                heatmapContainer.style.display = 'none';
+            }
+
+            // Animate bar (fixed 100% since F1=1.0)
+            setTimeout(() => {
+                document.getElementById('confidence-fill').style.width = '100%';
+            }, 100);
+        } else {
+            throw new Error(data.message);
+        }
 
     } catch (err) {
         console.error(err);
         loader.style.display = 'none';
         welcome.style.display = 'block';
-        welcome.innerText = "Error during prediction. Please try again.";
+        welcome.innerText = "Error: " + err.message;
         predictBtn.disabled = false;
     }
 }

@@ -1,51 +1,32 @@
-.. highlight:: shell
-
 ============
 Installation
 ============
-
-
-Stable release
---------------
-
-To install Pneumonia_Classifier, run this command in your terminal:
-
-.. code-block:: console
-
-    $ pip install pneumonia_classifier
-
-This is the preferred method to install Pneumonia_Classifier, as it will always install the most recent stable release.
-
-If you don't have `pip`_ installed, this `Python installation guide`_ can guide
-you through the process.
-
-.. _pip: https://pip.pypa.io
-.. _Python installation guide: http://docs.python-guide.org/en/latest/starting/installation/
-
 
 From sources
 ------------
 
 The sources for Pneumonia_Classifier can be downloaded from the `Github repo`_.
 
-You can either clone the public repository:
+1. **Clone the repository**:
 
-.. code-block:: console
+   .. code-block:: console
 
-    $ git clone git://github.com/AyushDocs/pneumonia_classifier
+      $ git clone https://github.com/AyushDocs/pneumonia_classifier
+      $ cd pneumonia_classifier
 
-Or download the `tarball`_:
+2. **Environment Setup**:
 
-.. code-block:: console
+   .. code-block:: console
 
-    $ curl -OJL https://github.com/AyushDocs/pneumonia_classifier/tarball/master
+      $ python -m venv .venv
+      $ .venv\Scripts\activate  # On Windows
+      $ pip install -r requirements.txt
 
-Once you have a copy of the source, you can install it with:
+3. **Install in editable mode**:
 
-.. code-block:: console
+   .. code-block:: console
 
-    $ python setup.py install
-
+      $ pip install -e .
 
 .. _Github repo: https://github.com/AyushDocs/pneumonia_classifier
-.. _tarball: https://github.com/AyushDocs/pneumonia_classifier/tarball/master
+
