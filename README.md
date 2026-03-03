@@ -1,5 +1,7 @@
 # PnuemoCheck AI: Pneumonia Classifier
+[![Live Demo](https://img.shields.io/badge/Demo-Live_Now-brightgreen?style=for-the-badge&logo=github)](https://ayushdocs.github.io/pneumonia_classifier/)
 
+Pneumonia classification using deep learning.
 An end-to-end medical imaging project using Deep Learning to detect pneumonia from Chest X-rays, featuring explainability and production-ready deployment.
 
 ## 🌟 Key Features
