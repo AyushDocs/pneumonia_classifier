@@ -6,6 +6,9 @@ include:
   - "*.py"
 python:
   packages:
+    - bentoml
+    - pydantic-settings
+    - opencv-python-headless
     - torch
     - torchvision
     - pillow
