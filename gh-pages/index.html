@@ -1,0 +1,374 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PneumoCheck AI | Demo Showcase</title>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        :root {
+            --bg: #0f172a;
+            --card: #1e293b;
+            --primary: #3b82f6;
+            --text: #f8fafc;
+            --text-dim: #94a3b8;
+            --pneumonia: #ef4444;
+            --normal: #22c55e;
+        }
+
+        body {
+            font-family: 'Outfit', sans-serif;
+            background-color: var(--bg);
+            color: var(--text);
+            margin: 0;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            min-height: 100vh;
+            padding: 2rem;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 3rem;
+            max-width: 800px;
+        }
+
+        .logo-icon {
+            font-size: 3rem;
+            color: var(--primary);
+            margin-bottom: 1rem;
+        }
+
+        h1 {
+            margin: 0;
+            font-size: 2.5rem;
+            letter-spacing: -0.025em;
+        }
+
+        .subtitle {
+            color: var(--text-dim);
+            font-size: 1.125rem;
+            margin-top: 0.5rem;
+        }
+
+        .main-grid {
+            display: grid;
+            grid-template-columns: 1fr 1.5fr;
+            gap: 2rem;
+            max-width: 1100px;
+            width: 100%;
+        }
+
+        .card {
+            background: var(--card);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 1rem;
+            padding: 1.5rem;
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+        }
+
+        .results-card-inactive {
+            opacity: 0.5;
+            pointer-events: none;
+        }
+
+        .card-title {
+            font-size: 1.25rem;
+            font-weight: 600;
+            margin-bottom: 1.5rem;
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+
+        .sample-grid {
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+        }
+
+        .sample-item {
+            cursor: pointer;
+            padding: 1rem;
+            border-radius: 0.75rem;
+            background: rgba(255, 255, 255, 0.03);
+            border: 2px solid transparent;
+            transition: all 0.2s;
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .sample-item:hover {
+            background: rgba(255, 255, 255, 0.07);
+        }
+
+        .sample-item.active {
+            border-color: var(--primary);
+            background: rgba(59, 130, 246, 0.1);
+        }
+
+        .sample-thumb {
+            width: 60px;
+            height: 60px;
+            border-radius: 0.5rem;
+            object-fit: cover;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .sample-info .name {
+            font-weight: 600;
+            display: block;
+        }
+
+        .sample-info .type {
+            font-size: 0.875rem;
+            color: var(--text-dim);
+        }
+
+        .viewer-container {
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+        }
+
+        .image-stack {
+            position: relative;
+            width: 100%;
+            aspect-ratio: 1;
+            border-radius: 0.75rem;
+            overflow: hidden;
+            background: #000;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .display-img {
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
+        }
+
+        #heatmap-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            mix-blend-mode: screen;
+            opacity: 0.7;
+            pointer-events: none;
+            display: none;
+        }
+
+        .metrics {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1rem;
+            margin-top: 1rem;
+        }
+
+        .metric-box {
+            padding: 1rem;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 0.75rem;
+            text-align: center;
+        }
+
+        .label {
+            font-size: 0.75rem;
+            color: var(--text-dim);
+            text-transform: uppercase;
+            font-weight: 700;
+            margin-bottom: 0.25rem;
+        }
+
+        .value {
+            font-size: 1.5rem;
+            font-weight: 700;
+        }
+
+        .badge {
+            display: inline-block;
+            padding: 0.25rem 0.75rem;
+            border-radius: 9999px;
+            font-size: 0.875rem;
+            font-weight: 700;
+        }
+
+        .badge-pneumonia {
+            background: rgba(239, 68, 68, 0.2);
+            color: var(--pneumonia);
+        }
+
+        .badge-normal {
+            background: rgba(34, 197, 94, 0.2);
+            color: var(--normal);
+        }
+
+        .btn {
+            width: 100%;
+            padding: 1rem;
+            border-radius: 0.75rem;
+            border: none;
+            font-family: inherit;
+            font-weight: 700;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: all 0.2s;
+            background: var(--primary);
+            color: #fff;
+            margin-top: 1.5rem;
+        }
+
+        .btn:hover {
+            filter: brightness(1.1);
+            transform: translateY(-1px);
+        }
+
+        @media (max-width: 768px) {
+            .main-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .portfolio-note {
+            margin-top: 3rem;
+            padding: 1rem;
+            border-left: 4px solid var(--primary);
+            background: rgba(59, 130, 246, 0.05);
+            max-width: 800px;
+            font-size: 0.875rem;
+            color: var(--text-dim);
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="header">
+        <i class="fas fa-lungs logo-icon"></i>
+        <h1>PnuemoCheck AI Portfolio</h1>
+        <p class="subtitle">Diagnostic Simulation Showcase for Clinical Interview</p>
+    </div>
+
+    <div class="main-grid">
+        <div class="card">
+            <div class="card-title"><i class="fas fa-list"></i> Select Sample Case</div>
+            <div class="sample-grid">
+                <div class="sample-item active" onclick="loadSample('pneumonia')">
+                    <img src="assets/pneumonia_sample.png" class="sample-thumb" alt="Sample radiograph with pneumonia">
+                    <div class="sample-info">
+                        <span class="name">Case #882</span>
+                        <span class="type">Clinical Observation Required</span>
+                    </div>
+                </div>
+                <div class="sample-item" onclick="loadSample('normal')">
+                    <img src="assets/normal_sample.png" class="sample-thumb" alt="Sample normal radiograph">
+                    <div class="sample-info">
+                        <span class="name">Case #401</span>
+                        <span class="type">Regular Screen</span>
+                    </div>
+                </div>
+            </div>
+
+            <button class="btn" id="analyze-btn" onclick="startAnalysis()">
+                Initiate Neural Analysis
+            </button>
+        </div>
+
+        <div class="card results-card-inactive" id="results-card">
+            <div class="card-title"><i class="fas fa-microscope"></i> Diagnostic Vision</div>
+
+            <div class="viewer-container">
+                <div class="image-stack">
+                    <img id="base-img" src="assets/pneumonia_sample.png" class="display-img" alt="X-ray scan">
+                    <img id="heatmap-overlay" src="assets/pneumonia_heatmap.png" class="display-img"
+                        alt="Grad-CAM explainability heatmap">
+                </div>
+
+                <div class="metrics">
+                    <div class="metric-box">
+                        <div class="label">Prediction</div>
+                        <div id="pred-val" class="value badge badge-pneumonia">PNEUMONIA</div>
+                    </div>
+                    <div class="metric-box">
+                        <div class="label">Confidence</div>
+                        <div id="conf-val" class="value">94.8%</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="portfolio-note">
+        <strong>Interviewer Note:</strong> This is a static portfolio demonstration. The real-time application utilizes
+        a PyTorch CNN backend, BentoML 1.4 for model orchestration, and a Celery/Redis pipeline for scalable explainable
+        AI (Grad-CAM) generation. The results shown here are pre-baked to demonstrate the diagnostic interface and
+        explainability heatmaps.
+    </div>
+
+    <script>
+        const samples = {
+            pneumonia: {
+                img: 'assets/pneumonia_sample.png',
+                heatmap: 'assets/pneumonia_heatmap.png',
+                pred: 'PNEUMONIA',
+                conf: '94.8%',
+                class: 'badge-pneumonia'
+            },
+            normal: {
+                img: 'assets/normal_sample.png',
+                heatmap: null,
+                pred: 'NORMAL',
+                conf: '99.2%',
+                class: 'badge-normal'
+            }
+        };
+
+        let currentSample = 'pneumonia';
+
+        function loadSample( key ) {
+            currentSample = key;
+            document.querySelectorAll( '.sample-item' ).forEach( el => el.classList.remove( 'active' ) );
+            event.currentTarget.classList.add( 'active' );
+
+            // Reset results
+            document.getElementById( 'results-card' ).style.opacity = '0.5';
+            document.getElementById( 'results-card' ).style.pointer_events = 'none';
+            document.getElementById( 'heatmap-overlay' ).style.display = 'none';
+            document.getElementById( 'base-img' ).src = samples[ key ].img;
+            document.getElementById( 'analyze-btn' ).innerText = 'Initiate Neural Analysis';
+            document.getElementById( 'analyze-btn' ).disabled = false;
+        }
+
+        function startAnalysis() {
+            const btn = document.getElementById( 'analyze-btn' );
+            btn.disabled = true;
+            btn.innerText = 'Running Inference...';
+
+            setTimeout( () => {
+                const data = samples[ currentSample ];
+                document.getElementById( 'results-card' ).style.opacity = '1';
+                document.getElementById( 'results-card' ).style.pointerEvents = 'auto';
+
+                document.getElementById( 'pred-val' ).innerText = data.pred;
+                document.getElementById( 'pred-val' ).className = 'value badge ' + data.class;
+                document.getElementById( 'conf-val' ).innerText = data.conf;
+
+                if ( data.heatmap ) {
+                    document.getElementById( 'heatmap-overlay' ).src = data.heatmap;
+                    document.getElementById( 'heatmap-overlay' ).style.display = 'block';
+                } else {
+                    document.getElementById( 'heatmap-overlay' ).style.display = 'none';
+                }
+
+                btn.innerText = 'Analysis Complete';
+            }, 800 );
+        }
+    </script>
+</body>
+
+</html>

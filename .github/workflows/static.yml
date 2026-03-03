@@ -31,8 +31,8 @@ jobs:
             - name: Upload artifact
               uses: actions/upload-pages-artifact@v3
               with:
-                  # Deploy the whole repository as it now contains index.html at root
-                  path: "."
+                  # Deploy only the portfolio demo directory
+                  path: "gh-pages"
 
             - name: Deploy to GitHub Pages
               id: deployment
