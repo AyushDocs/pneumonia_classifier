@@ -1,5 +1,6 @@
 bentoml
 torchvision
+torch
 joblib
 tqdm
 pip-chill
@@ -12,10 +13,16 @@ numpy
 pandas
 fastapi
 uvicorn
-opencv-python
+opencv-python-headless
 optuna
 plotly
 mlflow
 nbformat
 ipywidgets
+streamlit
+reportlab
+celery
+redis
+torchao
 -e .
+

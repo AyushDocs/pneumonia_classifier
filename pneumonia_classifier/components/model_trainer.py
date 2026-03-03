@@ -11,13 +11,12 @@ from torch.optim.lr_scheduler import StepLR, _LRScheduler
 from tqdm import tqdm
 
 from pneumonia_classifier.constant.training_pipeline import DEVICE
-from pneumonia_classifier.entity.artifacts_entity import DataTransformationArtifact,ModelTrainerArtifact
+from pneumonia_classifier.entity.artifacts_entity import (
+    DataTransformationArtifact, ModelTrainerArtifact)
 from pneumonia_classifier.entity.config_entity import ModelTrainerConfig
 from pneumonia_classifier.exception import XRayException
 from pneumonia_classifier.logger import logging
-from pneumonia_classifier.ml.model.arch import Net
-
-
+from pneumonia_classifier.ml.model.arch import PneumoniaEnsemble
 
 
 class ModelTrainer:
@@ -32,7 +31,8 @@ class ModelTrainer:
             data_transformation_artifact
         )
 
-        self.model: Module = Net()
+        self.model: Module = PneumoniaEnsemble()
+        self.class_weights = None
 
 
 
@@ -68,8 +68,8 @@ class ModelTrainer:
 
                 y_pred = self.model(data)
 
-                # Calculating loss given the prediction
-                loss = F.nll_loss(y_pred, target)
+                # Calculating loss given the prediction with class weights
+                loss = F.nll_loss(y_pred, target, weight=self.class_weights)
 
                 # Backprop
                 loss.backward()
@@ -122,7 +122,7 @@ class ModelTrainer:
 
                     output = self.model(data)
 
-                    test_loss += F.nll_loss(output, target, reduction="sum").item()
+                    test_loss += F.nll_loss(output, target, weight=self.class_weights, reduction="sum").item()
 
                     pred = output.argmax(dim=1, keepdim=True)
 
@@ -178,6 +178,23 @@ class ModelTrainer:
 
             model: Module = self.model.to(self.model_trainer_config.device)
 
+            # Calculate class weights for Weighted Loss (Address Recall)
+            # Normal: 0, Pneumonia: 1. We want to penalize missing Pneumonia more.
+            # Even if balanced, we can increase the weight for Class 1 (Pneumonia)
+            train_dataset = self.data_transformation_artifact.transformed_train_object.dataset
+            targets = torch.tensor(train_dataset.targets)
+            class_counts = torch.bincount(targets)
+
+            # Higher weight for Pneumonia (Class 1) to improve sensitivity
+            # Manual boost for recall (e.g., 2x or 3x the balance weight)
+            # For 50% recall, we need a significant boost.
+            weights = 1. / class_counts.float()
+            # Boost the Pneumonia weight significantly
+            weights[1] = weights[1] * 2.5
+            self.class_weights = (weights / weights.sum() * 2).to(DEVICE)
+
+            logging.info(f"Class Weights applied: {self.class_weights}")
+
             optimizer: Optimizer = torch.optim.SGD(
                 model.parameters(), **self.model_trainer_config.optimizer_params
             )
@@ -224,4 +241,5 @@ class ModelTrainer:
             return model_trainer_artifact
 
         except Exception as e:
+            raise XRayException(e, sys)
             raise XRayException(e, sys)

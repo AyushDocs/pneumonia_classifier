@@ -9,7 +9,10 @@ graph TD
     C -->|Augmented Data| D(Model Trainer)
     D -->|Trained Model| E(Model Evaluation)
     E -->|Valid Model| F(Model Pusher)
-    F -->|Deploy| G[BentoML Registry]
+    F -->|Deploy| G[BentoML Store]
+    G -->|int8| H(Fast Inference)
+    G -->|float32| I(Shadow XAI)
+    I -->|Heatmap| J[MLflow Explanations]
 
     subgraph "Core Package"
     B

@@ -1,25 +1,36 @@
 :root {
-    --primary: #4F46E5;
-    --primary-hover: #4338CA;
-    --bg: #0F172A;
-    --card-bg: #1E293B;
-    --text: #F8FAFC;
-    --text-muted: #94A3B8;
-    --accent: #10B981;
-    --danger: #EF4444;
-    --glass: rgba(30, 41, 59, 0.7);
+    --primary: #3b82f6;
+    --primary-hover: #2563eb;
+    --bg: #f8fafc;
+    --surface: #ffffff;
+    --text: #1e293b;
+    --text-muted: #64748b;
+    --border: #e2e8f0;
+    --shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
+}
+
+.dark-theme {
+    --bg: #0f172a;
+    --surface: #1e293b;
+    --text: #f8fafc;
+    --text-muted: #94a3b8;
+    --border: #334155;
+    --shadow: 0 4px 6px -1px rgb(0 0 0 / 0.5);
 }
 
 * {
+    box-sizing: border-box;
     margin: 0;
     padding: 0;
-    box-sizing: border-box;
     font-family: 'Outfit', sans-serif;
 }
 
 body {
+    font-family: 'Inter', system-ui, -apple-system, sans-serif;
     background-color: var(--bg);
     color: var(--text);
+    line-height: 1.5;
+    transition: background-color 0.3s, color 0.3s;
     min-height: 100vh;
     display: flex;
     flex-direction: column;
@@ -29,9 +40,28 @@ body {
 }
 
 .container {
-    max-width: 1000px;
-    width: 100%;
-    margin-top: 2rem;
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 20px;
+}
+
+.header-content {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.icon-btn {
+    background: transparent;
+    border: none;
+    color: var(--text);
+    font-size: 1.5rem;
+    cursor: pointer;
+    transition: color 0.3s;
+}
+
+.icon-btn:hover {
+    color: var(--primary);
 }
 
 header {
@@ -44,6 +74,7 @@ h1 {
     font-weight: 700;
     background: linear-gradient(to right, #818CF8, #34D399);
     -webkit-background-clip: text;
+    background-clip: text;
     -webkit-text-fill-color: transparent;
     margin-bottom: 1rem;
 }
@@ -55,8 +86,8 @@ p.subtitle {
 
 .main-grid {
     display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 2rem;
+    grid-template-columns: 1fr 1.5fr;
+    gap: 30px;
 }
 
 @media (max-width: 768px) {
@@ -66,13 +97,17 @@ p.subtitle {
 }
 
 .card {
-    background: var(--glass);
+    background: var(--surface);
+    border-radius: 1rem;
+    padding: 2rem;
+    box-shadow: var(--shadow);
+    margin-bottom: 2rem;
+    transition: background-color 0.3s;
+    -webkit-backdrop-filter: blur(12px);
     backdrop-filter: blur(12px);
     border: 1px solid rgba(255, 255, 255, 0.1);
-    border-radius: 24px;
-    padding: 2rem;
     height: 100%;
-    transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    transform: translateY(0px); /* Resetting from original hover */
 }
 
 .card:hover {
@@ -230,4 +265,202 @@ p.subtitle {
 @keyframes rotation {
     0% { transform: rotate(0deg); }
     100% { transform: rotate(360deg); }
+}
+.input-group {
+    margin-bottom: 20px;
+}
+
+.input-label {
+    display: block;
+    margin-bottom: 8px;
+    font-size: 0.9rem;
+    color: #aaa;
+}
+
+.patient-input {
+    width: 100%;
+    padding: 12px;
+    border-radius: 8px;
+    border: 1px solid #333;
+    background: #1a1a1a;
+    color: #fff;
+}
+
+.upload-icon {
+    font-size: 3rem;
+    color: #666;
+    margin-bottom: 15px;
+}
+
+.btn-primary {
+    width: 100%;
+    padding: 15px;
+    font-weight: 600;
+    background: #3b82f6;
+    border: none;
+    border-radius: 8px;
+    color: #fff;
+    cursor: pointer;
+}
+
+.history-section {
+    margin-top: 30px;
+    border-top: 1px solid #333;
+    padding-top: 20px;
+}
+
+.history-title {
+    font-size: 1rem;
+    margin-bottom: 15px;
+    color: #888;
+}
+
+.history-list {
+    max-height: 250px;
+    overflow-y: auto;
+}
+
+.history-empty {
+    color: #555;
+    font-style: italic;
+}
+
+.results-card {
+    min-height: 500px;
+}
+
+.welcome-message {
+    text-align: center;
+    color: #555;
+    padding-top: 150px;
+}
+
+.welcome-icon {
+    font-size: 4rem;
+    opacity: 0.1;
+    margin-bottom: 20px;
+}
+
+.prediction-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+}
+
+.confidence-info {
+    text-align: right;
+}
+
+.prediction-badge-new {
+    padding: 10px 20px;
+    border-radius: 6px;
+    font-weight: 700;
+    font-size: 1.2rem;
+}
+
+.confidence-label {
+    font-size: 0.75rem;
+    color: #888;
+}
+
+.confidence-value {
+    font-weight: 600;
+    color: #3b82f6;
+}
+
+.analysis-message {
+    color: #ccc;
+    line-height: 1.6;
+    padding: 15px;
+    background: #1a1a1a;
+    border-radius: 8px;
+    margin-bottom: 20px;
+    border-left: 4px solid #3b82f6;
+}
+
+.report-btn {
+    width: 100%;
+    padding: 12px;
+    background: #1e293b;
+    color: #fff;
+    border-radius: 8px;
+    margin-bottom: 25px;
+    border: 1px solid #334155;
+    cursor: pointer;
+}
+
+.heatmap-label {
+    font-size: 0.85rem;
+    color: #888;
+    margin-bottom: 10px;
+}
+
+.osd-viewer {
+    width: 100%;
+    height: 350px;
+    background: #000;
+    border-radius: 8px;
+    border: 1px solid #333;
+}
+
+.text-primary { color: #3b82f6 !important; }
+.border-primary { border-color: #3b82f6 !important; }
+.border-muted { border-color: #444 !important; }
+.border-error { border-color: #ef4444 !important; }
+
+.history-item {
+    padding: 10px;
+    border-bottom: 1px solid #222;
+    margin-bottom: 5px;
+}
+
+.history-item .status-normal { color: #10b981; font-weight: 600; }
+.history-item .status-pneumonia { color: #ef4444; font-weight: 600; }
+.history-item .meta { font-size: 0.75rem; color: #666; }
+
+.history-empty-text { color: #444; font-style: italic; }
+
+.error-message {
+    color: #ef4444;
+    padding-top: 151px;
+}
+
+.bg-pneumonia { background-color: #ef4444 !important; }
+.bg-normal { background-color: #10b981 !important; }
+
+.sample-prompt {
+    text-align: center;
+    margin-top: 10px;
+}
+.sample-text {
+    font-size: 0.85rem;
+    color: #888;
+}
+.sample-btn {
+    background: none;
+    border: none;
+    color: #3b82f6;
+    cursor: pointer;
+    text-decoration: underline;
+    font-size: 0.85rem;
+}
+
+/* Login Modal Styles Extracted */
+.login-error {
+    display: none;
+    font-size: 0.9em;
+    margin-bottom: 10px;
+}
+.login-input-col-1 {
+    margin-bottom: 15px;
+}
+.login-input-col-2 {
+    margin-bottom: 20px;
+}
+.login-btn-wide {
+    width: 100%;
+}
+.main-app-hidden {
+    display: none;
 }

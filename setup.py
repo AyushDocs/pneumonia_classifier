@@ -1,11 +1,4 @@
-from setuptools import find_packages, setup
+from setuptools import setup
 
-setup(
-    name = 'pneumonia_classifier',
-    version= '0.0.0',
-    author= 'Ayush Dubey',
-    author_email= 'ayushalokdubey@gmail.com',
-    packages= find_packages(),
-    install_requires = []
-
-)
+if __name__ == "__main__":
+    setup()

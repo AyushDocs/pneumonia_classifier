@@ -12,8 +12,8 @@ An end-to-end medical imaging project using Deep Learning to detect pneumonia fr
 ## 🛠️ Tech Stack
 
 - **Core**: Python 3.10, PyTorch, FastAPI
-- **XAI**: OpenCV, Grad-CAM (Target layer: `convolution_block9`)
-- **Ops**: MLflow (Tracking), Optuna (Tuning), BentoML (Serving)
+- **XAI**: OpenCV, Grad-CAM (Standardized in `docs/XAI_WORKFLOW.md`)
+- **Ops**: BentoML (Model Store & Serving), MLflow (Experiment Tracking & XAI Explanations)
 - **UI**: Vanilla HTML/CSS/JS with a premium, responsive glassmorphism design.
 
 ## 🚀 Quick Start

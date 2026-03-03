@@ -4,74 +4,154 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Pneumonia Classifier | AI Medical Assistant</title>
+    <title>PnuemoCheck AI | Clinical Diagnostic Assistant</title>
     <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <link rel="stylesheet" href="static/style.css">
+
+    <!-- PWA Manifest -->
+    <link rel="manifest" href="/manifest.json">
+    <meta name="theme-color" content="#007bff">
 </head>
 
 <body>
-
-    <header>
-        <h1>PnuemoCheck AI</h1>
-        <p class="subtitle">Instant Chest X-Ray Analysis for Clinical Decision Support</p>
+    <header class="header">
+        <div class="header-content">
+            <div class="logo-container">
+                <i class="fas fa-lungs logo-icon"></i>
+                <div>
+                    <h1 class="logo-text">PnuemoCheck AI</h1>
+                    <p class="subtitle">Tri-Modal Ensemble Diagnostics</p>
+                </div>
+            </div>
+            <!-- Dark Mode Toggle -->
+            <button id="theme-toggle" class="icon-btn" title="Toggle Dark Mode">
+                <i class="fas fa-moon"></i>
+            </button>
+        </div>
     </header>
 
-    <div class="container">
-        <div class="main-grid">
-            <!-- Input Card -->
-            <div class="card">
-                <div class="card-title">🔍 Input Analysis</div>
-
-                <div class="upload-area" id="drop-zone">
-                    <p id="upload-text">📁 Drag & drop X-ray or Click to select</p>
-                    <input type="file" id="image-upload" accept="image/*">
-                    <img id="preview-img" alt="Preview">
-                </div>
-
-                <div style="margin: 2rem 0; text-align: center; color: var(--text-muted); font-size: 0.9rem;">
-                    — OR SELECT A SAMPLE —
-                </div>
-
-                <div class="samples-gallery" id="samples-gallery">
-                    <!-- Samples will be rendered here by script.js -->
-                </div>
-
-                <button class="btn" id="predict-btn" disabled onclick="handlePredict()">Run AI Prediction</button>
+    <!-- Login Modal -->
+    <div id="login-modal" class="modal-overlay">
+        <div class="modal-content">
+            <h2 class="modal-title"><i class="fas fa-user-md"></i> Clinical Login</h2>
+            <p class="modal-subtitle">Authentication Required</p>
+            <div id="login-error" class="error-message login-error">
             </div>
-
-            <!-- Result Card -->
-            <div class="card">
-                <div class="card-title">📊 Diagnosis Result</div>
-
-                <div id="welcome-message" style="color: var(--text-muted); text-align: center; padding-top: 5rem;">
-                    Upload an image or select a sample to begin analysis.
-                </div>
-
-                <div class="loader" id="loader"></div>
-
-                <div id="result-display">
-                    <div id="prediction-text" class="prediction-badge">NORMAL</div>
-                    <div style="font-size: 0.9rem; color: var(--text-muted); margin-bottom: 0.5rem;">CONDFIDENCE SCORE
-                    </div>
-                    <div id="confidence-text" style="font-size: 1.5rem; font-weight: 700;">94.2%</div>
-                    <div class="confidence-bar">
-                        <div class="confidence-fill" id="confidence-fill"></div>
-                    </div>
-
-                    <div id="heatmap-container" style="margin-top: 1.5rem; display: none;">
-                        <div style="font-size: 0.9rem; color: var(--text-muted); margin-bottom: 0.5rem;">EXPLAINABILITY
-                            HEATMAP</div>
-                        <img id="heatmap-img"
-                            style="width: 100%; border-radius: 8px; border: 1px solid var(--border-color);">
-                    </div>
-
-                    <p id="message-text" style="color: var(--text-muted); line-height: 1.6; margin-top: 1rem;"></p>
-                </div>
+            <div class="input-col login-input-col-1">
+                <label class="input-label-small" for="login-username">Username</label>
+                <input type="text" id="login-username" placeholder="e.g. dr_smith" class="patient-input-small">
             </div>
+            <div class="input-col login-input-col-2">
+                <label class="input-label-small" for="login-password">Password</label>
+                <input type="password" id="login-password" placeholder="••••••••" class="patient-input-small">
+            </div>
+            <button id="login-submit-btn" class="btn btn-primary login-btn-wide">Authenticate</button>
         </div>
     </div>
 
+    <div class="container main-app-hidden" id="main-app">
+        <div class="main-grid">
+
+            <!-- Input & History Column -->
+            <div class="column">
+                <div class="card">
+                    <div class="card-title"><i class="fas fa-microscope"></i> Diagnostic Input</div>
+
+                    <div class="input-row">
+                        <div class="input-col">
+                            <label class="input-label-small" for="patient-id">Patient Registry ID</label>
+                            <input type="text" id="patient-id" placeholder="e.g. PAT-98234" class="patient-input-small">
+                        </div>
+                        <div class="input-col">
+                            <label class="input-label-small" for="doctor-id">Doctor / Requester ID</label>
+                            <input type="text" id="doctor-id" placeholder="e.g. DR-SMITH" class="patient-input-small">
+                        </div>
+                    </div>
+
+                    <p class="input-hint">
+                        <input type="file" id="file-input" accept="image/*" hidden>
+                        <i class="fas fa-cloud-upload-alt upload-icon"></i>
+                        <span id="file-name">Click or Drag X-ray to Analyze</span>
+                    </p>
+                </div>
+
+                <div class="sample-prompt">
+                    <span class="sample-text">No X-ray? </span>
+                    <button id="try-sample-btn" class="sample-btn">Try
+                        a sample</button>
+                </div>
+
+                <button id="predict-btn" class="btn btn-primary">
+                    Run Tri-Modal Analysis
+                </button>
+
+                <div id="history-section" class="history-section">
+                    <h3 class="history-title"><i class="fas fa-history"></i>
+                        Patient History</h3>
+                    <div id="history-list" class="history-list">
+                        <p class="history-empty">Analyze a scan to build history.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Results Column -->
+        <div class="column">
+            <div class="card results-card">
+                <div class="card-title"><i class="fas fa-chart-bar"></i> Analysis Result</div>
+
+                <div id="welcome-message" class="welcome-message">
+                    <i class="fas fa-file-medical-alt welcome-icon"></i>
+                    <p>Awaiting clinical input for diagnostic processing.</p>
+                </div>
+
+                <div id="loader" class="loader"></div>
+
+                <div id="result-display">
+                    <div class="prediction-header">
+                        <div id="prediction-badge" class="prediction-badge-new">-
+                        </div>
+                        <div class="confidence-info">
+                            <div class="confidence-label">CONFIDENCE TYPE</div>
+                            <div id="confidence-val" class="confidence-value">Tri-Modal Ensemble
+                            </div>
+                        </div>
+                    </div>
+
+                    <p id="message" class="analysis-message">
+                    </p>
+
+                    <button id="download-report-btn" class="btn report-btn">
+                        <i class="fas fa-file-pdf"></i> Download Clinical Report (PDF)
+                    </button>
+
+                    <div id="heatmap-container">
+                        <h4 class="heatmap-label">EXPLAINABILITY HEATMAP
+                            (INTERACTIVE ZOOM)</h4>
+                        <div id="osd-viewer" class="osd-viewer">
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </div>
+    </div>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/openseadragon/4.1.0/openseadragon.min.js"></script>
     <script src="static/script.js"></script>
+    <script>
+        if ( 'serviceWorker' in navigator ) {
+            window.addEventListener( 'load', () => {
+                navigator.serviceWorker.register( '/sw.js' ).then( reg => {
+                    console.log( 'Service Worker registered:', reg.scope );
+                } ).catch( err => {
+                    console.log( 'Service Worker registration failed:', err );
+                } );
+            } );
+        }
+    </script>
 </body>
 
 </html>

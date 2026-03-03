@@ -1,3 +1,4 @@
+import torch
 import torch.nn as nn
 import torch.nn.functional as F
 
@@ -42,6 +43,7 @@ class Net(nn.Module):
         )
 
         self.pooling33 = nn.MaxPool2d(2, 2)
+        self.dropout1 = nn.Dropout(0.25)
 
         self.convolution_block4 = nn.Sequential(
             nn.Conv2d(
@@ -116,6 +118,7 @@ class Net(nn.Module):
         )
 
         self.gap = nn.Sequential(nn.AvgPool2d(kernel_size=4))
+        self.dropout2 = nn.Dropout(0.5)
 
         self.convolution_block_out = nn.Sequential(
             nn.Conv2d(
@@ -123,35 +126,37 @@ class Net(nn.Module):
             ),
         )
 
-    def forward(self, x) -> float:
+    def forward(self, x) -> torch.Tensor:
         x = self.convolution_block1(x)
-
         x = self.pooling11(x)
-
         x = self.convolution_block2(x)
-
         x = self.pooling22(x)
-
         x = self.convolution_block3(x)
-
         x = self.pooling33(x)
-
+        x = self.dropout1(x)
         x = self.convolution_block4(x)
-
         x = self.convolution_block5(x)
-
         x = self.convolution_block6(x)
-
         x = self.convolution_block7(x)
-
         x = self.convolution_block8(x)
-
         x = self.convolution_block9(x)
-
         x = self.gap(x)
-
+        x = self.dropout2(x)
         x = self.convolution_block_out(x)
-
         x = x.view(-1, 2)
-
         return F.log_softmax(x, dim=-1)
+
+# Allowlist Net and core PyTorch modules for safe unpickling in PyTorch 2.6+
+if hasattr(torch.serialization, 'add_safe_globals'):
+    torch.serialization.add_safe_globals([
+        Net,
+        nn.Sequential,
+        nn.Conv2d,
+        nn.ReLU,
+        nn.BatchNorm2d,
+        nn.MaxPool2d,
+        nn.AvgPool2d,
+        nn.Dropout
+    ])
+
+

@@ -1,0 +1,27 @@
+.venv/
+.git/
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.pytest_cache/
+.vscode/
+
+# Application generated data
+heatmaps/
+logs/
+artifacts/
+*.db
+*.pdf
+
+# Python packaging
+pneumonia_classifier.egg-info/
+dist/
+build/
+tox.ini
+
+# Large data/models that should be handled carefully (if applicable)
+# models/
+# model_dir/
+# NOTE: Keeping these for now as the app needs them,
+# but ignoring them would speed up build if they change often.
