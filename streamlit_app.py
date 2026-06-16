@@ -129,6 +129,19 @@ def dashboard():
     """)
 
     st.sidebar.divider()
+    st.sidebar.header("Model Performance")
+    st.sidebar.markdown("""
+    | Metric | Score |
+    |--------|-------|
+    | Accuracy | **98%** |
+    | Pneumonia Recall | **100%** |
+    | Normal Recall | **96%** |
+    | Macro F1 | **0.98** |
+    | ROC AUC | **1.00** |
+    """)
+    st.sidebar.caption("Evaluated on 57 test samples with optimized threshold (0.1).")
+
+    st.sidebar.divider()
     if st.sidebar.button("Logout", key="logout_btn"):
         st.session_state.authenticated = False
         st.session_state.user = None

@@ -45,6 +45,38 @@ An end-to-end medical imaging project using Deep Learning to detect pneumonia fr
 
 - [Detailed Research Findings](docs/RESEARCH_FINDINGS.md)
 
+## 📊 Model Performance
+
+| Metric | Score |
+|--------|-------|
+| **Accuracy** | 98% |
+| **Pneumonia Precision** | 97% |
+| **Pneumonia Recall** | 100% |
+| **Normal Precision** | 100% |
+| **Normal Recall** | 96% |
+| **Macro F1-Score** | 0.98 |
+| **ROC AUC** | 1.00 |
+
+> Evaluated on 57 test samples with optimized threshold (0.1) for high sensitivity.
+
+### Cross-Validation (5-Fold Stratified)
+
+| Fold | Accuracy | F1-Score |
+|------|----------|----------|
+| 1 | 92.86% | 0.927 |
+| 2 | 97.62% | 0.976 |
+| 3 | 92.86% | 0.933 |
+| 4 | 95.24% | 0.950 |
+| 5 | 97.62% | 0.977 |
+| **Mean** | **95.24%** | **0.953** |
+
+### Quantization (INT8)
+
+| | FP32 | INT8 | Improvement |
+|--|------|------|-------------|
+| Size | 243 KB | 52 KB | **4.64x** smaller |
+| Latency | 108 ms | 27 ms | **3.99x** faster |
+
 ## 📂 Project Structure
 
 - `notebooks/`: Research pipeline (01-10)
