@@ -74,7 +74,8 @@ def _run_local_inference(processed_image, patient_id):
     @st.cache_resource
     def _load_model():
         model = Net()
-        loaded_data = torch.load(config.PT_MODEL_PATH, map_location='cpu', weights_only=False)
+        from pneumonia_classifier.config import get_model_path
+        loaded_data = torch.load(get_model_path(), map_location='cpu', weights_only=False)
         if not isinstance(loaded_data, dict) and hasattr(loaded_data, "state_dict"):
             state_dict = loaded_data.state_dict()
         else:

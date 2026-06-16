@@ -1,13 +1,22 @@
 import os
 
 import torch
+from huggingface_hub import hf_hub_download
 from pydantic_settings import BaseSettings
 from torchvision import transforms
 
+HF_REPO = "24f2004275/pneumonia_classifier"
+DEFAULT_MODEL = "pneumonia_classifier_cnn_uza7heywpgthvahb.pt"
+
+
+def _get_model_path(model_filename: str = DEFAULT_MODEL) -> str:
+    """Download model from HF Hub (cached after first download)."""
+    return hf_hub_download(repo_id=HF_REPO, filename=model_filename)
+
 
 class Settings(BaseSettings):
-    # Model Configuration
-    PT_MODEL_PATH: str = os.path.join(os.getcwd(), "models", "pneumonia_classifier_cnn_uza7heywpgthvahb.pt")
+    # Model Configuration — resolved at runtime via HF Hub
+    PT_MODEL_PATH: str = ""
     DEVICE: str = "cuda" if torch.cuda.is_available() else "cpu"
 
     # DB Configuration
@@ -20,8 +29,20 @@ class Settings(BaseSettings):
     class Config:
         env_file = ".env"
 
+
 # Instantiate global config
 config = Settings()
+
+# Lazy model path — downloaded on first access
+_model_path = None
+
+
+def get_model_path() -> str:
+    global _model_path
+    if _model_path is None:
+        _model_path = _get_model_path()
+    return _model_path
+
 
 # Fixed Transforms (Not strictly config, but fits here for inference pipeline)
 TRANSFORM = transforms.Compose([

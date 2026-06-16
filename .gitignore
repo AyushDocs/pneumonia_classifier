@@ -110,3 +110,6 @@ ENV/
 
 artifacts
 data/tmp/
+data/heatmaps/
+models/*.pt
+mlflow.db

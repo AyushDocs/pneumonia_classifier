@@ -18,3 +18,4 @@ plotly
 scikit-learn
 matplotlib
 seaborn
+huggingface_hub

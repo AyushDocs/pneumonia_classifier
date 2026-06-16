@@ -35,7 +35,7 @@ def process_inference(job_id: str, b64_image: str, patient_id: str, requester_id
         global pt_model
         if pt_model is None:
             pt_model = Net()
-            loaded_data = torch.load(config.PT_MODEL_PATH, map_location='cpu', weights_only=False)
+            loaded_data = torch.load(config.get_model_path(), map_location='cpu', weights_only=False)
 
             # Ensure we get the state_dict
             if not isinstance(loaded_data, dict) and hasattr(loaded_data, "state_dict"):
@@ -45,7 +45,7 @@ def process_inference(job_id: str, b64_image: str, patient_id: str, requester_id
 
             pt_model.load_state_dict(state_dict, strict=False)
             pt_model.eval()
-            logger.info(f"Worker loaded PyTorch model from {config.PT_MODEL_PATH}")
+            logger.info(f"Worker loaded PyTorch model from HF Hub")
 
         image_bytes = base64.b64decode(b64_image)
         image = Image.open(io.BytesIO(image_bytes)).convert('RGB')

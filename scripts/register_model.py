@@ -10,7 +10,7 @@ MODEL_NAME = "pneumonia_classifier_model"
 TRANSFORMS_KEY = "pneumonia_classifier_train_transforms"
 
 def register():
-    model_path = config.PT_MODEL_PATH
+    model_path = config.get_model_path()
 
     if not os.path.exists(model_path):
         print(f"Error: Model file not found at {model_path}")
