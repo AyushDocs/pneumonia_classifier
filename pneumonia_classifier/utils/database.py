@@ -19,6 +19,7 @@ from sqlalchemy.orm import sessionmaker
 from pneumonia_classifier.logger import logging
 
 DB_PATH = os.path.join(os.getcwd(), "data", "patient_history.db")
+os.makedirs(os.path.dirname(DB_PATH), exist_ok=True)
 DATABASE_URL = f"sqlite:///{DB_PATH}"
 
 engine = create_engine(DATABASE_URL, connect_args={"check_same_thread": False})

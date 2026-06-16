@@ -1,15 +1,17 @@
 import base64
 import io
+import logging
 import os
 import time
 
 import streamlit as st
-from celery import Celery
 from PIL import Image
 
 from frontend.utils import auto_crop_xray, is_valid_xray
-from pneumonia_classifier.config import config
+from pneumonia_classifier.config import TRANSFORM, config
 from pneumonia_classifier.utils.report_generator import ReportGenerator
+
+logger = logging.getLogger(__name__)
 
 
 def render_diagnosis_tab():
@@ -60,6 +62,76 @@ def render_diagnosis_tab():
         if st.session_state.prediction_result:
             render_results(st.session_state.prediction_result)
 
+def _run_local_inference(processed_image, patient_id):
+    """Fallback: run inference directly in the Streamlit process when Celery is unavailable."""
+    import cv2
+    import numpy as np
+    import torch
+    from pneumonia_classifier.ml.explainability import get_medical_heatmap
+    from pneumonia_classifier.ml.model.arch import Net
+    from pneumonia_classifier.utils.database import save_drift_log, save_prediction
+
+    @st.cache_resource
+    def _load_model():
+        model = Net()
+        loaded_data = torch.load(config.PT_MODEL_PATH, map_location='cpu', weights_only=False)
+        if not isinstance(loaded_data, dict) and hasattr(loaded_data, "state_dict"):
+            state_dict = loaded_data.state_dict()
+        else:
+            state_dict = loaded_data
+        model.load_state_dict(state_dict, strict=False)
+        model.eval()
+        return model
+
+    model = _load_model()
+    input_tensor = TRANSFORM(processed_image).unsqueeze(0)
+
+    # Drift logging
+    try:
+        save_drift_log(f"local_{int(time.time())}", float(np.mean(input_tensor.numpy())), float(np.std(input_tensor.numpy())))
+    except Exception:
+        pass
+
+    with torch.no_grad():
+        output = model(input_tensor)
+        probabilities = torch.exp(output)
+
+    pred_idx = int(probabilities.argmax().item())
+    prediction = "Pneumonia" if pred_idx == 1 else "Normal"
+    confidence = f"{probabilities[0][pred_idx].item() * 100:.1f}%"
+
+    # Grad-CAM
+    heatmap_base64 = ""
+    heatmap_path = ""
+    try:
+        heatmap_img_bgr = get_medical_heatmap(model, input_tensor, processed_image)
+        if heatmap_img_bgr is not None:
+            heatmap_path = f"data/heatmaps/{patient_id}_{int(time.time())}.png"
+            os.makedirs("data/heatmaps", exist_ok=True)
+            cv2.imwrite(heatmap_path, heatmap_img_bgr)
+            h_rgb = cv2.cvtColor(heatmap_img_bgr, cv2.COLOR_BGR2RGB)
+            buf = io.BytesIO()
+            Image.fromarray(h_rgb).save(buf, format="PNG")
+            heatmap_base64 = f"data:image/png;base64,{base64.b64encode(buf.getvalue()).decode('utf-8')}"
+    except Exception as e:
+        logger.warning(f"Grad-CAM failed: {e}")
+
+    # Original image as base64
+    orig_buf = io.BytesIO()
+    processed_image.save(orig_buf, format="PNG")
+    orig_b64 = f"data:image/png;base64,{base64.b64encode(orig_buf.getvalue()).decode('utf-8')}"
+
+    save_prediction(patient_id, prediction, confidence, heatmap_path, st.session_state.user, "127.0.0.1")
+
+    return {
+        "patient_id": patient_id,
+        "prediction": prediction,
+        "confidence": confidence,
+        "heatmap_base64": heatmap_base64,
+        "original_image": orig_b64,
+    }
+
+
 def render_inference_flow(image_to_process, patient_id):
     with st.spinner("Executing CNN Inference..."):
         valid, reason = is_valid_xray(image_to_process)
@@ -69,32 +141,48 @@ def render_inference_flow(image_to_process, patient_id):
             processed_image = auto_crop_xray(image_to_process)
             REDIS_URL = config.REDIS_URL
 
+            # Quick socket check — avoids Celery's background retry threads
+            import socket
+            redis_available = False
             try:
-                # Trigger Celery Task
-                celery_app = Celery("inference_tasks", broker=REDIS_URL, backend=REDIS_URL)
+                from urllib.parse import urlparse
+                parsed = urlparse(REDIS_URL)
+                sock = socket.create_connection((parsed.hostname, parsed.port), timeout=2)
+                sock.close()
+                redis_available = True
+            except Exception:
+                redis_available = False
 
-                # Encode image for transport
-                buffered = io.BytesIO()
-                processed_image.save(buffered, format="PNG")
-                b64_image = base64.b64encode(buffered.getvalue()).decode('utf-8')
+            if redis_available:
+                try:
+                    from celery import Celery
+                    celery_app = Celery("inference_tasks", broker=REDIS_URL, backend=REDIS_URL)
+                    celery_app.conf.broker_connection_retry_on_startup = False
 
-                # Get remote info (mocked in streamlit as we don't have request object)
-                requester_ip = "127.0.0.1"
-                job_id = f"job_{int(time.time())}"
+                    buffered = io.BytesIO()
+                    processed_image.save(buffered, format="PNG")
+                    b64_image = base64.b64encode(buffered.getvalue()).decode('utf-8')
+                    requester_ip = "127.0.0.1"
+                    job_id = f"job_{int(time.time())}"
 
-                # Trigger
-                celery_app.send_task(
-                    "process_inference",
-                    args=[job_id, b64_image, patient_id, st.session_state.user, requester_ip]
-                )
+                    celery_app.send_task(
+                        "process_inference",
+                        args=[job_id, b64_image, patient_id, st.session_state.user, requester_ip]
+                    )
 
-                # Notify user and provide link
-                report_url = f"/?job={job_id}"
-                # Unified clinical feedback
-                st.info(f"**Analysis in Progress.** [View Live Diagnostic Report]({report_url})")
+                    report_url = f"/?job={job_id}"
+                    st.info(f"**Analysis in Progress.** [View Live Diagnostic Report]({report_url})")
+                    return
 
-            except Exception as e:
-                st.error(f"Failed to orchestrate inference: {e}")
+                except Exception:
+                    pass
+
+            # Fallback: local inference
+            st.warning("**Celery/Redis unavailable** — running inference locally. "
+                       "Start Redis + Celery worker for better throughput and background processing.")
+            result = _run_local_inference(processed_image, patient_id)
+            st.session_state.prediction_result = result
+            st.rerun()
 
 def render_results(res):
     st.markdown("---")
