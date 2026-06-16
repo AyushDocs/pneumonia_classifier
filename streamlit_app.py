@@ -140,6 +140,7 @@ def dashboard():
     | ROC AUC | **1.00** |
     """)
     st.sidebar.caption("Evaluated on 57 test samples with optimized threshold (0.1).")
+    st.sidebar.markdown("[View all models on 🤗 Hugging Face](https://huggingface.co/24f2004275/pneumonia_classifier)")
 
     st.sidebar.divider()
     if st.sidebar.button("Logout", key="logout_btn"):
